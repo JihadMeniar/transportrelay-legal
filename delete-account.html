@@ -277,102 +277,18 @@
       </ul>
     </div>
 
-    <button class="btn-delete" onclick="showDialog()">Supprimer mon compte</button>
-    <a class="btn-cancel" href="index.html">Annuler</a>
+    <a class="btn-delete" href="mailto:support@transportrelay.app?subject=Demande%20de%20suppression%20de%20compte&body=Bonjour%2C%0A%0AJe%20souhaite%20supprimer%20mon%20compte%20Relay%20Transport.%0A%0AEmail%20du%20compte%20%3A%20%5BVotre%20email%5D%0A%0AMerci.">
+      Envoyer une demande par email
+    </a>
+    <a class="btn-cancel" href="index.html">Retour</a>
 
     <hr class="divider" />
 
     <div class="contact-section">
-      Vous préférez faire une demande par email ?<br />
-      Contactez-nous : <a href="mailto:support@transportrelay.app">support@transportrelay.app</a><br />
-      Délai de traitement : 30 jours maximum.
+      Vous pouvez également supprimer votre compte directement depuis l'application :<br />
+      <strong>Profil → Zone de danger → Supprimer mon compte</strong><br /><br />
+      Délai de traitement (email) : 30 jours maximum.
     </div>
   </div>
-
-  <!-- Confirmation dialog -->
-  <div class="overlay" id="overlay">
-    <div class="dialog">
-      <div id="formView">
-        <h2>Confirmer la suppression</h2>
-        <p>Entrez votre adresse email pour confirmer la suppression définitive de votre compte.</p>
-        <div class="form-group">
-          <label for="emailInput">Votre adresse email</label>
-          <input type="email" id="emailInput" placeholder="exemple@email.com" />
-        </div>
-        <div id="errorMsg" style="color:#c62828;font-size:13px;margin-bottom:12px;display:none;"></div>
-        <div class="dialog-actions">
-          <button class="btn-back" onclick="hideDialog()">Annuler</button>
-          <button class="btn-confirm" onclick="submitDeletion()">Confirmer</button>
-        </div>
-      </div>
-
-      <div class="result" id="successView">
-        <div class="result-icon">✅</div>
-        <h2>Demande envoyée</h2>
-        <p>Votre demande de suppression a été enregistrée. Votre compte sera supprimé dans un délai de <strong>30 jours</strong>.<br /><br />Un email de confirmation vous sera envoyé.</p>
-      </div>
-
-      <div class="result" id="errorView">
-        <div class="result-icon">❌</div>
-        <h2>Compte introuvable</h2>
-        <p id="errorDetail">Aucun compte n'est associé à cette adresse email. Vérifiez l'adresse saisie.</p>
-        <div style="margin-top:20px;">
-          <button class="btn-back" style="width:100%;border-radius:10px;" onclick="backToForm()">Réessayer</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const API = 'https://transportrelay-api.onrender.com/api';
-
-    function showDialog() {
-      document.getElementById('overlay').classList.add('visible');
-    }
-    function hideDialog() {
-      document.getElementById('overlay').classList.remove('visible');
-      backToForm();
-    }
-    function backToForm() {
-      document.getElementById('formView').style.display = 'block';
-      document.getElementById('successView').classList.remove('visible');
-      document.getElementById('errorView').classList.remove('visible');
-      document.getElementById('errorMsg').style.display = 'none';
-      document.getElementById('emailInput').value = '';
-    }
-
-    async function submitDeletion() {
-      const email = document.getElementById('emailInput').value.trim();
-      const errorMsg = document.getElementById('errorMsg');
-
-      if (!email || !email.includes('@')) {
-        errorMsg.textContent = 'Veuillez entrer une adresse email valide.';
-        errorMsg.style.display = 'block';
-        return;
-      }
-
-      errorMsg.style.display = 'none';
-
-      try {
-        const res = await fetch(`${API}/auth/request-deletion`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email })
-        });
-
-        if (res.ok) {
-          document.getElementById('formView').style.display = 'none';
-          document.getElementById('successView').classList.add('visible');
-        } else {
-          document.getElementById('formView').style.display = 'none';
-          document.getElementById('errorView').classList.add('visible');
-        }
-      } catch (e) {
-        // Fallback: show success anyway (email request)
-        document.getElementById('formView').style.display = 'none';
-        document.getElementById('successView').classList.add('visible');
-      }
-    }
-  </script>
 </body>
 </html>
