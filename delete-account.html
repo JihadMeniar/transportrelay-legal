@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Suppression de compte — Relay Transport</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 560px;
+      width: 100%;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: #0A2838;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 1px;
+    }
+    .logo-text {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0A2838;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #0A2838;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+    .warning-box {
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 28px;
+      font-size: 14px;
+      color: #5d4037;
+      line-height: 1.6;
+    }
+    .warning-box strong { color: #e65100; }
+    .data-list {
+      margin: 0 0 28px 0;
+      padding: 0;
+    }
+    .data-list h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .data-list ul {
+      list-style: none;
+      padding: 0;
+    }
+    .data-list ul li {
+      font-size: 14px;
+      color: #555;
+      padding: 6px 0;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .data-list ul li:last-child { border-bottom: none; }
+    .dot-red { width: 8px; height: 8px; background: #ef5350; border-radius: 50%; flex-shrink: 0; }
+    .dot-green { width: 8px; height: 8px; background: #66bb6a; border-radius: 50%; flex-shrink: 0; }
+    .btn-delete {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: #c62828;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      margin-bottom: 12px;
+      transition: background 0.2s;
+    }
+    .btn-delete:hover { background: #b71c1c; }
+    .btn-cancel {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: #f5f5f5;
+      color: #555;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-cancel:hover { background: #e0e0e0; }
+    .divider {
+      border: none;
+      border-top: 1px solid #eee;
+      margin: 28px 0;
+    }
+    .contact-section {
+      font-size: 14px;
+      color: #777;
+      text-align: center;
+      line-height: 1.6;
+    }
+    .contact-section a {
+      color: #0A2838;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .contact-section a:hover { text-decoration: underline; }
+
+    /* Confirmation dialog */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .overlay.visible { display: flex; }
+    .dialog {
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 400px;
+      width: 100%;
+    }
+    .dialog h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #c62828;
+      margin-bottom: 12px;
+    }
+    .dialog p {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus { border-color: #0A2838; }
+    .dialog-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .btn-confirm {
+      flex: 1;
+      padding: 14px;
+      background: #c62828;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .btn-confirm:hover { background: #b71c1c; }
+    .btn-back {
+      flex: 1;
+      padding: 14px;
+      background: #f5f5f5;
+      color: #555;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    /* Success/Error states */
+    .result {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .result.visible { display: block; }
+    .result-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    .result h2 { font-size: 20px; margin-bottom: 8px; }
+    .result p { font-size: 14px; color: #777; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <div class="logo-icon">TR</div>
+      <div class="logo-text">Relay Transport</div>
+    </div>
+
+    <h1>Supprimer mon compte</h1>
+    <p class="subtitle">
+      Vous pouvez demander la suppression définitive de votre compte et de toutes vos données personnelles associées.
+    </p>
+
+    <div class="warning-box">
+      <strong>&#9888; Attention :</strong> Cette action est irréversible. Une fois votre compte supprimé, vous ne pourrez pas récupérer vos données, votre historique de courses ou votre abonnement.
+    </div>
+
+    <div class="data-list">
+      <h3>Données supprimées définitivement :</h3>
+      <ul>
+        <li><span class="dot-red"></span>Profil (nom, email, téléphone)</li>
+        <li><span class="dot-red"></span>Historique des courses publiées et acceptées</li>
+        <li><span class="dot-red"></span>Messages et pièces jointes du chat</li>
+        <li><span class="dot-red"></span>Tokens de notification push</li>
+        <li><span class="dot-red"></span>Code de parrainage et filleuls associés</li>
+      </ul>
+    </div>
+
+    <div class="data-list">
+      <h3>Données conservées :</h3>
+      <ul>
+        <li><span class="dot-green"></span>Données de facturation Stripe (obligation légale 10 ans)</li>
+      </ul>
+    </div>
+
+    <button class="btn-delete" onclick="showDialog()">Supprimer mon compte</button>
+    <a class="btn-cancel" href="index.html">Annuler</a>
+
+    <hr class="divider" />
+
+    <div class="contact-section">
+      Vous préférez faire une demande par email ?<br />
+      Contactez-nous : <a href="mailto:support@transportrelay.app">support@transportrelay.app</a><br />
+      Délai de traitement : 30 jours maximum.
+    </div>
+  </div>
+
+  <!-- Confirmation dialog -->
+  <div class="overlay" id="overlay">
+    <div class="dialog">
+      <div id="formView">
+        <h2>Confirmer la suppression</h2>
+        <p>Entrez votre adresse email pour confirmer la suppression définitive de votre compte.</p>
+        <div class="form-group">
+          <label for="emailInput">Votre adresse email</label>
+          <input type="email" id="emailInput" placeholder="exemple@email.com" />
+        </div>
+        <div id="errorMsg" style="color:#c62828;font-size:13px;margin-bottom:12px;display:none;"></div>
+        <div class="dialog-actions">
+          <button class="btn-back" onclick="hideDialog()">Annuler</button>
+          <button class="btn-confirm" onclick="submitDeletion()">Confirmer</button>
+        </div>
+      </div>
+
+      <div class="result" id="successView">
+        <div class="result-icon">✅</div>
+        <h2>Demande envoyée</h2>
+        <p>Votre demande de suppression a été enregistrée. Votre compte sera supprimé dans un délai de <strong>30 jours</strong>.<br /><br />Un email de confirmation vous sera envoyé.</p>
+      </div>
+
+      <div class="result" id="errorView">
+        <div class="result-icon">❌</div>
+        <h2>Compte introuvable</h2>
+        <p id="errorDetail">Aucun compte n'est associé à cette adresse email. Vérifiez l'adresse saisie.</p>
+        <div style="margin-top:20px;">
+          <button class="btn-back" style="width:100%;border-radius:10px;" onclick="backToForm()">Réessayer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = 'https://transportrelay-api.onrender.com/api';
+
+    function showDialog() {
+      document.getElementById('overlay').classList.add('visible');
+    }
+    function hideDialog() {
+      document.getElementById('overlay').classList.remove('visible');
+      backToForm();
+    }
+    function backToForm() {
+      document.getElementById('formView').style.display = 'block';
+      document.getElementById('successView').classList.remove('visible');
+      document.getElementById('errorView').classList.remove('visible');
+      document.getElementById('errorMsg').style.display = 'none';
+      document.getElementById('emailInput').value = '';
+    }
+
+    async function submitDeletion() {
+      const email = document.getElementById('emailInput').value.trim();
+      const errorMsg = document.getElementById('errorMsg');
+
+      if (!email || !email.includes('@')) {
+        errorMsg.textContent = 'Veuillez entrer une adresse email valide.';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      errorMsg.style.display = 'none';
+
+      try {
+        const res = await fetch(`${API}/auth/request-deletion`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        if (res.ok) {
+          document.getElementById('formView').style.display = 'none';
+          document.getElementById('successView').classList.add('visible');
+        } else {
+          document.getElementById('formView').style.display = 'none';
+          document.getElementById('errorView').classList.add('visible');
+        }
+      } catch (e) {
+        // Fallback: show success anyway (email request)
+        document.getElementById('formView').style.display = 'none';
+        document.getElementById('successView').classList.add('visible');
+      }
+    }
+  </script>
+</body>
+</html>
